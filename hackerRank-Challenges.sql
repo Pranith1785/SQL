@@ -165,14 +165,14 @@ order by c.company_code
 
 
 -- 24. Occupations
-
+--SQL server
 select Doctor,Professor,Singer,Actor
 From
 (Select Name, occupation from Occupations)t
 PIVOT
 (max(Name) for occupation IN (Doctor,Professor,Singer,Actor)) as t2;
 
-
+--mysql
 set @r1=0, @r2=0, @r3=0, @r4=0;
 select min(Doctor), min(Professor), min(Singer), min(Actor)
 from(
@@ -188,4 +188,83 @@ from(
   order by Name
 ) Temp
 group by RowNumber
+
+
+---- Aggregration
+
+--25. Revising Aggregations - The Count Function
+Select count(Name)
+From CITY
+Where Population > 100000
+
+--26. Revising Aggregations - The Sum Function
+select sum(POPULATION) from CITY where DISTRICT = 'California'
+
+--27. Revising Aggregations - Averages
+select avg(Population) from City where District = 'California'
+
+--28. Average Population
+select ROUND(avg(Population)) from City
+
+--29. Japan Population
+select sum(Population) from City where COUNTRYCODE = 'jpn'
+
+--30. Population Density Difference
+select max(Population)-min(Population) from City
+
+--31. The Blunder
+select CEIL(avg(salary) - avg(replace(salary,'0',''))) from employees
+
+--32. Top Earners
+Select max(salary*months) as earnings,count(*)
+From Employee
+group by earnings 
+order by earnings desc 
+Limit 1
+
+--33. Weather Observation Station 2
+Select round(sum(lat_n),2),round(sum(long_w),2)
+From Station
+
+--34. Weather Observation Station 13
+Select truncate(sum(lat_n),4)
+From Station
+where lat_n > 38.7880
+and lat_n < 137.2345
+
+--35. Weather Observation Station 14
+Select truncate(max(lat_n),4)
+From Station
+where lat_n < 137.2345
+
+--36. Weather Observation Station 15
+Select round(long_w,4)
+From Station
+Where lat_n = (select max(lat_n) from station where lat_n < 137.2345)
+
+--37. Weather Observation Station 16
+Select round(min(lat_n),4)
+From Station
+where lat_n > 38.7780
+
+--38. Weather Observation Station 17
+Select round(long_w,4)
+from station
+where lat_n = (select min(lat_n) from station where lat_n>38.7780)
+
+--39. Weather Observation Station 18
+Select round((max(lat_n)-min(lat_n)) + (max(long_w) - min(long_w)),4) 
+from station
+
+--40. Weather Observation Station 19
+Select truncate(sqrt(power(max(lat_n)-min(lat_n),2) + power(max(long_w) - min(long_w),2)),4) 
+from station
+
+--41. Weather Observation Station 20
+select round(lat_n,4) as median 
+From station s
+where (select count(lat_n) from station where s.lat_n>lat_n) =
+ (select count(lat_n) from station where s.lat_n<lat_n)
+
+
 
