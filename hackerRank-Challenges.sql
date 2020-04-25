@@ -350,10 +350,42 @@ or total in
     (select total
      from (
         select count(*) as total
-        from Hackers H, Challenges C
-        where H.hacker_id = C.hacker_id
-        group by H.hacker_id, H.name
+        from Challenges
+        group by hacker_id
       ) counts
      group by total
      having count(*) = 1)
 order by total desc, H.hacker_id asc
+
+---- Advanced Join
+
+--51. Placements
+
+Select s.name
+From students s
+inner join friends f
+ON s.id = f.id
+inner join packages p1
+on s.id = p1.id
+inner join packages p2
+on f.friend_id = p2.id
+where p1.salary < p2.salary
+order by p2.salary asc
+
+
+-- 52. Symmetric Pairs
+
+with f as(
+    Select X,Y,
+            ROW_NUMBER() OVER ( 
+                PARTITION BY X,Y
+                ORDER BY X) as row_num
+    From functions
+)
+select Distinct f1.x,f1.y
+From f as f1
+join functions f2
+on f1.x = f2.y and f1.y = f2.x 
+		and (f1.x != f1.y or f1.row_num>1)
+Where f1.x<=f1.y  
+order by f1.x
