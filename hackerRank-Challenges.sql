@@ -389,3 +389,20 @@ on f1.x = f2.y and f1.y = f2.x
 		and (f1.x != f1.y or f1.row_num>1)
 Where f1.x<=f1.y  
 order by f1.x
+
+
+-- 53. SQL Project Planning
+
+Select start_date,min(end_date)
+from
+  (select Start_date
+  from projects
+  where start_date not in 
+        ( select end_date from projects)) a,   
+  (select end_date
+  from projects
+  where end_date not in 
+      ( select start_date from projects)) b
+where start_date < end_date
+group by start_date
+order by datediff(day,start_date,min(end_date)),start_date
