@@ -406,3 +406,29 @@ from
 where start_date < end_date
 group by start_date
 order by datediff(day,start_date,min(end_date)),start_date
+
+
+-- 54. Interviews
+
+Select cn.contest_id,cn.hacker_id,cn.name,
+       sum(ss.ts),sum(ss.tas),
+       sum(vs.tv),sum(vs.tuv)
+From contests cn
+join Colleges cl
+     On cn.contest_id = cl.contest_id
+join Challenges cg
+     On cl.college_id = cg.college_id
+left join (select challenge_id, sum(total_views) as tv,
+                          sum(total_unique_views) as tuv
+           from View_Stats
+           group by challenge_id) vs
+      On cg.challenge_id = vs.challenge_id
+left join (select challenge_id,sum(total_submissions) as ts,
+                          sum(total_accepted_submissions) as tas
+            From Submission_stats
+            group by challenge_id) ss
+      On cg.challenge_id = ss.challenge_id
+group by cn.contest_id,cn.hacker_id,cn.name
+having sum(ss.ts) + sum(ss.tas) + sum(vs.tv) + sum(vs.tuv) > 0
+order by cn.contest_id
+
