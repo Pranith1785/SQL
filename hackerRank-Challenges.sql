@@ -432,3 +432,33 @@ group by cn.contest_id,cn.hacker_id,cn.name
 having sum(ss.ts) + sum(ss.tas) + sum(vs.tv) + sum(vs.tuv) > 0
 order by cn.contest_id
 
+
+-- 55. 15 days of Learning SQL 
+
+Select uq_hc.submission_date,uq_hc.hc_cnt,max_sub.hacker_id,h.name
+From
+	(select rt.submission_date, COUNT(DISTINCT(rt.hacker_id)) as hc_cnt
+	from
+	(select submission_date, hacker_id,
+		DENSE_RANK() over(order by submission_date) as date_rank,
+		DENSE_RANK() over(partition by hacker_id order by submission_date) as hacker_rank
+	from submissions) rt
+	where rt.date_rank = rt.hacker_rank
+	group by rt.submission_date) uq_hc
+join
+	(select ct.submission_date,ct.hacker_id,
+			rank() over(partition by ct.submission_date
+						order by ct.cnt desc,ct.hacker_id) as rnk
+	from
+	(select submission_date,hacker_id,count(submission_id) as cnt
+	from submissions
+	group by submission_date,hacker_id) ct) max_sub
+ON
+  uq_hc.submission_date = max_sub.submission_date 
+  and
+  max_sub.rnk =1
+Join 
+   hackers h
+ON 
+  h.hacker_id = max_sub.hacker_id
+order by uq_hc.submission_date
