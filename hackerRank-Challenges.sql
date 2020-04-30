@@ -462,3 +462,31 @@ Join
 ON 
   h.hacker_id = max_sub.hacker_id
 order by uq_hc.submission_date
+
+
+---- Alternative Queries 
+
+-- 56. Draw The Triangle 1
+
+-- method 1
+with nt as (
+    select 5 r
+	union all
+	select r-1 r from nt where r >1
+)select REPLICATE('* ',r) from nt
+
+--method 2
+Declare @cnt INT = 5;
+
+while @cnt > 0
+BEGIN
+	print REPLICATE('* ',@cnt);
+	SET @cnt = @cnt - 1;
+END;
+
+-- 57. Draw The Triangle 2
+with nt as (
+    select 1 r
+	union all
+	select r+1 r from nt where r <20
+)select REPLICATE('* ',r) from nt
