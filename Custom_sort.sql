@@ -40,6 +40,8 @@ select *,
 sum(amount) over(partition by salesperson_id)
 from int_orders
 
+
+
 -- calculate the rolling sum/ cum sum of amount
 select *,
 sum(amount) over(order by salesperson_id)
