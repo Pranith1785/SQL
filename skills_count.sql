@@ -67,12 +67,57 @@ group by student_id
 having count(*) = 2
 
 -- method 7
- 
+
 select *
 from students s
 inner join students p on s.student_id = p.student_id
 left join students o on s.student_id = o.student_id and o.skill not in ('sql','python')
 where s.skill = 'sql' and p.skill = 'python' and  o.skill is null
+
+--method 8
+with sql as (select * from students where skill='sql')
+, python as (select * from students where skill='python')
+, other as (select * from students where skill not in ('sql','python'))
+select student_id from sql
+intersect
+select student_id from python
+except
+select student_id from other
+
+-- method 9
+with cte as(
+select student_id,
+sum(case when skill in ('sql','python') then 1 else 10 end) as skill_cnt
+from students
+group by student_id)
+select * from cte 
+where skill_cnt = 2
+
+----------------------------sub query and correlated queries
+--get employees whose salary is greater than their department salary
+
+--method 1 independent subquery
+select * 
+from emp e1
+join (select department_id,AVG(salary) as avg_dept_salary from emp group by department_id) d
+on e1.department_id = d.department_id
+where salary > avg_dept_salary
+
+-- method 2
+with cte as
+(select * ,
+AVG(salary) over (partition by department_id) as avg_dept_salary
+from emp)
+select * from cte
+where salary >avg_dept_salary
+
+-- method 3 correlated subquery
+select * 
+from emp e1
+where e1.salary > ( select AVG(e2.salary) from emp e2 where e1.department_id =  e2.department_id)
+
+
+
 
 
 
